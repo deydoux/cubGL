@@ -2,25 +2,21 @@
 #include <QDebug>
 #include <QFileDialog>
 
-UploadButton::UploadButton(): QPushButton("Upload Map...")
+UploadButton::UploadButton(Scene &scene): QPushButton("Upload Map..."), _scene(scene)
 {
 	connect(this, &QAbstractButton::pressed, [this]() {
 		const QString path = QFileDialog::getOpenFileName();
-		try {
-			openFile(path);
-		} catch (OpenFail &e) {
-
-		}
+		openFile(path);
 	});
 }
 
-std::shared_ptr<QFile> UploadButton::openFile(const QString &path)
+void UploadButton::openFile(const QString &path)
 {
-	auto file = std::make_shared<QFile>(path);
+	QFile file(path);
 
-	if (!file->open(QIODevice::ReadOnly))
-		throw new OpenFail();
+	if (!file.open(QIODevice::ReadOnly))
+		qWarning() << "Failed to open:" << path;
+	qInfo() << "Opened:" << path;
 
-	qDebug() << "Opened:" << file->fileName();
-	return file;
+	_scene.setMapFile(file);
 }

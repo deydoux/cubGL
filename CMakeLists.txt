@@ -12,6 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS
+	OpenGLWidgets
 	Widgets
 )
 
@@ -19,6 +20,7 @@ qt_standard_project_setup()
 
 qt_add_executable(${PROJECT_NAME}
 	./src/cubGL.cpp
+	./src/Scene.cpp
 	./src/UploadButton.cpp
 )
 
@@ -27,6 +29,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
+	Qt6::OpenGLWidgets
 	Qt6::Widgets
 )
 
