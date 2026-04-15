@@ -10,6 +10,8 @@ int main(int argc, char *argv[])
 	QVBoxLayout layout(&window);
 
 	UploadButton uploadButton;
+	if (argc > 1)
+		uploadButton.openFile(argv[1]);
 	layout.addWidget(&uploadButton);
 
 	window.resize(512, 512);
