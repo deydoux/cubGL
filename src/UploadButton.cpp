@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <QFileDialog>
 
-UploadButton::UploadButton(Scene &scene): QPushButton("Upload Map..."), _scene(scene)
+UploadButton::UploadButton(Scene &scene): QPushButton("Upload Map..."), scene(scene)
 {
 	connect(this, &QAbstractButton::pressed, [this]() {
 		const QString path = QFileDialog::getOpenFileName();
@@ -18,5 +18,5 @@ void UploadButton::openFile(const QString &path)
 		qWarning() << "Failed to open:" << path;
 	qInfo() << "Opened:" << path;
 
-	_scene.setMapFile(file);
+	scene.setMapFile(file);
 }

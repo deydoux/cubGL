@@ -14,7 +14,7 @@ public:
 	void openFile(const QString &path);
 
 private:
-	Scene &_scene;
+	Scene &scene;
 };
 
 #endif /* __UPLOADBUTTON_HPP__ */
