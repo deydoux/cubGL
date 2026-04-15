@@ -22,6 +22,7 @@ qt_add_executable(${PROJECT_NAME}
 	./src/cubGL.cpp
 	./src/Scene.cpp
 	./src/UploadButton.cpp
+	./ressources.qrc
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
