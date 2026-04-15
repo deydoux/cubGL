@@ -3,7 +3,44 @@
 
 void Scene::setMapFile(QFile &file)
 {
-	(void)file;
+	points.clear();
+
+	QTextStream stream(&file);
+
+	int maxX = 0;
+	int maxY = 0;
+
+	for (int y = 0; !stream.atEnd(); y++) {
+		if (y > maxY)
+			maxY = y;
+
+		QString line = stream.readLine();
+
+		for (int x = 0; x < line.length(); x++) {
+			if (line[x] != '1')
+				continue;
+
+			if (x > maxX)
+				maxX = x;
+
+			points.append(QPointF(x, y));
+		}
+	}
+
+	maxX = std::max(maxX, 1);
+	maxY = std::max(maxY, 1);
+
+	// Normalize to [-1, 1]
+	for (QPointF &point: points) {
+		float x = point.x();
+		float y = point.y();
+
+		point.setX((x / maxX) * 2.0f - 1.0f);
+		point.setY((y / maxY) * 2.0f - 1.0f);
+	}
+
+	qDebug() << maxX / 1 << maxY / 1;
+	update();
 }
 
 const GLfloat squareVertices[] = {

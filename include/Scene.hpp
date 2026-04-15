@@ -7,11 +7,11 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLWidget>
+#include <QPointF>
+#include <QVector>
 
 class Scene: public QOpenGLWidget, protected QOpenGLFunctions
 {
-// Q_OBJECT
-
 public:
 	void setMapFile(QFile &file);
 
@@ -24,6 +24,8 @@ private:
 	QOpenGLShaderProgram shaderProgram;
 	QOpenGLBuffer vertexBuffer;
 	QOpenGLVertexArrayObject vertexArray;
+
+	QVector<QPointF> points;
 };
 
 #endif /* __SCENE_HPP__ */
