@@ -15,8 +15,10 @@ void UploadButton::openFile(const QString &path)
 {
 	QFile file(path);
 
-	if (!file.open(QIODevice::ReadOnly))
+	if (!file.open(QIODevice::ReadOnly)) {
 		qWarning() << "Failed to open:" << path;
+		return ;
+	}
 	qInfo() << "Opened:" << path;
 
 	scene.setMapFile(file);
