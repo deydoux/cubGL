@@ -9,12 +9,10 @@ int main(int argc, char *argv[])
 	QWidget window;
 	QVBoxLayout layout(&window);
 
-	Scene scene;
+	Scene scene(argc > 1 ? argv[1] : nullptr);
 	layout.addWidget(&scene);
 
 	UploadButton uploadButton(scene);
-	if (argc > 1)
-		uploadButton.openFile(argv[1]);
 	layout.addWidget(&uploadButton);
 
 	window.resize(512, 512);

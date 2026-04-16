@@ -1,14 +1,18 @@
 #include "Scene.hpp"
 #include <QDebug>
 
+Scene::Scene(char *mapFilePath, QWidget *parent)
+	: QOpenGLWidget(parent), mapFilePath(mapFilePath)
+{}
+
 void Scene::setMapFile(QFile &file)
 {
 	points.clear();
 
 	QTextStream stream(&file);
 
-	int maxX = 0;
-	int maxY = 0;
+	float maxX = 0;
+	float maxY = 0;
 
 	for (int y = 0; !stream.atEnd(); y++) {
 		if (y > maxY)
@@ -27,8 +31,8 @@ void Scene::setMapFile(QFile &file)
 		}
 	}
 
-	maxX = std::max(maxX, 1);
-	maxY = std::max(maxY, 1);
+	maxX = std::fmax(maxX, 1);
+	maxY = std::fmax(maxY, 1);
 
 	// Normalize to [-1, 1]
 	for (QPointF &point: points) {
@@ -39,16 +43,15 @@ void Scene::setMapFile(QFile &file)
 		point.setY((y / maxY) * 2.0f - 1.0f);
 	}
 
-	qDebug() << maxX / 1 << maxY / 1;
+	if (vertexBuffer.isCreated()) {
+		QOpenGLVertexArrayObject::Binder vaoBinder(&vertexArray);
+		vertexBuffer.bind();
+		updateVertices(maxX, maxY);
+		vertexBuffer.release();
+	}
+
 	update();
 }
-
-const GLfloat squareVertices[] = {
-	-1.0f, -1.0f,
-	+1.0f, -1.0f,
-	-1.0f, +1.0f,
-	+1.0f, +1.0f,
-};
 
 void Scene::initializeGL()
 {
@@ -84,21 +87,26 @@ void Scene::initializeGL()
 
 	QOpenGLVertexArrayObject::Binder vaoBinder(&vertexArray);
 	vertexBuffer.bind();
-	vertexBuffer.allocate(squareVertices, sizeof(squareVertices));
+	updateVertices(1, 1);
 
 	shaderProgram.bind();
-	const int positionAttribute = shaderProgram.attributeLocation("a_position");
+	const int positionAttribute = shaderProgram.attributeLocation("position");
 	if (positionAttribute < 0) {
-		qWarning("Failed to locate vertex attribute a_position");
+		qWarning("Failed to locate vertex attribute position");
 		shaderProgram.release();
 		vertexBuffer.release();
 		return;
 	}
 	shaderProgram.enableAttributeArray(positionAttribute);
-	shaderProgram.setAttributeBuffer(positionAttribute, GL_FLOAT, 0, 2, 2 * sizeof(GLfloat));
+	shaderProgram.setAttributeBuffer(positionAttribute, GL_FLOAT, 0, 2, 2 * sizeof(float));
 	shaderProgram.release();
 
 	vertexBuffer.release();
+
+	QFile file(mapFilePath);
+	if (!file.open(QIODevice::ReadOnly))
+		qWarning() << "Failed to open map file:" << file.errorString();
+	setMapFile(file);
 }
 
 void Scene::resizeGL(int w, int h)
@@ -115,6 +123,33 @@ void Scene::paintGL()
 
 	shaderProgram.bind();
 	QOpenGLVertexArrayObject::Binder vaoBinder(&vertexArray);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	for (const QPointF &point: points) {
+		shaderProgram.setUniformValue("offset", QVector2D(point));
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	}
+
 	shaderProgram.release();
+}
+
+static const std::vector<float> baseSquareVertices = {
+	-1.0f, -1.0f,
+	+1.0f, -1.0f,
+	-1.0f, +1.0f,
+	+1.0f, +1.0f,
+};
+
+
+void Scene::updateVertices(float maxX, float maxY)
+{
+	std::vector<float> vertices = baseSquareVertices;
+
+	for (auto it = vertices.begin(); it != vertices.end(); ++it) {
+		*it /= maxX;
+		++it;
+		if (it != vertices.end())
+			*it /= maxY;
+	}
+
+	vertexBuffer.allocate(vertices.data(), vertices.size() * sizeof(float));
 }

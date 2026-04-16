@@ -13,6 +13,8 @@
 class Scene: public QOpenGLWidget, protected QOpenGLFunctions
 {
 public:
+	Scene(char *mapFilePath = nullptr, QWidget *parent = nullptr);
+
 	void setMapFile(QFile &file);
 
 protected:
@@ -25,7 +27,10 @@ private:
 	QOpenGLBuffer vertexBuffer;
 	QOpenGLVertexArrayObject vertexArray;
 
+	char *mapFilePath;
 	QVector<QPointF> points;
+
+	void updateVertices(float maxX, float maxY);
 };
 
 #endif /* __SCENE_HPP__ */

@@ -11,10 +11,10 @@ class UploadButton: public QPushButton
 public:
 	UploadButton(Scene &scene);
 
-	void openFile(const QString &path);
-
 private:
 	Scene &scene;
+
+	void openFile(const QString &path);
 };
 
 #endif /* __UPLOADBUTTON_HPP__ */

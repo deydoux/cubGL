@@ -1,6 +1,7 @@
-attribute vec2 a_position;
+attribute vec2 position;
+uniform vec2 offset;
 
 void main()
 {
-	gl_Position = vec4(a_position, 0.0, 1.25);
+	gl_Position = vec4(position - offset, 0.0, 1);
 }
